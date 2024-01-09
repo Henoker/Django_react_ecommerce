@@ -1,11 +1,42 @@
-import { useNavigate, Link } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { login } from '../../utils/auth'
-import { useState, useEffect } from'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { useAuthStore } from '../../store/auth'
+
 
 function Login() {
-    const {username, setUsername} = useState('')
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const [isLoading, setIsLoading] = useState(false)
+    const navigate = useNavigate()
+    const isLoggedIn = useAuthStore((state) => state.isLoggedIn)
+     console.log(email)
+     console.log(password)
+     
+useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/");
+    }
+  }, [isLoggedIn, navigate]);
 
-    navigate = useNavigate()
+
+    const resetForm = () => {
+        setEmail('')
+        setPassword('')
+    }
+
+    const handleLogin = async (e) => {  
+        e.preventDefault()
+        setIsLoading(true)
+        const {error} = await login(email, password)
+        if (error) {
+            alert(error)
+        } else {
+            navigate('/')
+            resetForm()
+        }
+        setIsLoading(false)
+    }
     return (
         <section>
             <main className="" style={{ marginBottom: 100, marginTop: 50 }}>
@@ -26,17 +57,18 @@ function Login() {
                                                 role="tabpanel"
                                                 aria-labelledby="tab-login"
                                             >
-                                                <form>
+                                                <form onSubmit={handleLogin} >
                                                     {/* Email input */}
                                                     <div className="form-outline mb-4">
                                                         <label className="form-label" htmlFor="Full Name">
                                                             Email Address
                                                         </label>
                                                         <input
-                                                            type="text"
-                                                            id="username"
-                                                            name="username"
-                                                            value={"Destiny"}
+                                                            type="email"
+                                                            id="email"
+                                                            name="email"
+                                                            value={email}
+                                                            onChange={(e) => setEmail(e.target.value)}
                                                             className="form-control"
 
                                                         />
@@ -50,7 +82,8 @@ function Login() {
                                                             type="password"
                                                             id="password"
                                                             name="password"
-                                                            value={"****************"}
+                                                            value={password}
+                                                            onChange={(e) => setPassword(e.target.value)}
                                                             className="form-control"
                                                         />
                                                     </div>
@@ -62,7 +95,7 @@ function Login() {
 
                                                     <div className="text-center">
                                                         <p className='mt-4'>
-                                                            Don&apos;t have an account? <Link to="/register">Register</Link>
+                                                            Dont have an account? <Link to="/register">Register</Link>
                                                         </p>
                                                         <p className='mt-0'>
                                                             <Link to="/forgot-password/" className='text-danger'>Forgot Password?</Link>

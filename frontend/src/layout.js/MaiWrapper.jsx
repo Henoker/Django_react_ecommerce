@@ -2,16 +2,21 @@ import {useEffect, useState} from 'react'
 import { setUser } from '../utils/auth';
 
 
-const MainWrapper = ({ children }) => {
+const MainWrapper = ({children}) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const handler = async () => {
-      setLoading(true);
-      await setUser();
+      try {
+        await setUser();
+        setLoading(false);
 
-      setLoading(false);
+      } catch (error) {
+        console.error('Error setting user:', error);
+        setLoading(false);
+      }
     };
+
     handler();
   }, []);
 
